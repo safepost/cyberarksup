@@ -1,0 +1,5 @@
+services:
+  - Cyber-Ark Privileged Session Manager
+  - TermService
+# comment
+# vaultIniLocation: C:\Program Files\Cyberark\PSM\Vault\Vault.ini
