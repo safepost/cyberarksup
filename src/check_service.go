@@ -57,6 +57,8 @@ func initLogger() {
 type SupConfig struct {
 	Services  []string `yaml:"services"`
 	VaultFile string   `yaml:"vaultIniLocation"`
+	Disks     []string `yaml:"disks"`
+	Port      int      `yaml:"listeningPort"`
 }
 
 // read YAML configuration file
@@ -64,7 +66,6 @@ func getConf(fileName string) (SupConfig, error) {
 	confFile, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		logrus.Fatal("Unable to read configuration file")
-		//panic(err)
 	}
 	var supConfig SupConfig
 
@@ -72,7 +73,6 @@ func getConf(fileName string) (SupConfig, error) {
 	if err != nil {
 		// probably not valid yaml file
 		logrus.Fatal("probably not valid yaml file")
-		//panic(err)
 	}
 
 	return supConfig, nil
@@ -92,7 +92,7 @@ func checkRunningService(serviceName string, manager *mgr.Mgr) (bool, error) {
 	return status.State == svc.Running, nil
 }
 
-func testVaultConnectivity(addr string, portOptional ...int) error {
+func testConnection(addr string, portOptional ...int) error {
 	port := 1858
 	if len(portOptional) > 0 {
 		port = portOptional[0]
@@ -107,14 +107,16 @@ func testVaultConnectivity(addr string, portOptional ...int) error {
 	return err
 }
 
-// Find
-func findVaultIPAddress(iniFilePath string) (string, error) {
+// Find ADDRESS filed in Vault.ini file and return list of IP Address (string format)
+func findVaultIPAddress(iniFilePath string) ([]string, error) {
 	cfg, err := ini.Load(iniFilePath)
 	if err != nil {
 		panic(err)
 	}
 
-	return cfg.Section("").Key("ADDRESS").String(), nil
+	vaultIPAddresses := cfg.Section("").Key("ADDRESS").String()
+
+	return strings.Split(vaultIPAddresses, ","), nil
 
 }
 
@@ -149,48 +151,55 @@ func findVaultINIFile() ([]string, error) {
 	return fileList, nil
 }
 
-func checkService(serviceName string) {
+func checkServices(services []string) bool {
 
 	// Check running services
 	manager, err := mgr.Connect()
 	if err != nil {
-		panic(err)
+		logrus.Info("Unable to connect to service manager !")
+		return false
+		//panic(err)
 	}
 	defer manager.Disconnect()
 
-	isRunning, err := checkRunningService(serviceName, manager)
-	if err != nil {
-		panic(err)
+	for _, service := range services {
+		isRunning, err := checkRunningService(service, manager)
+		if err != nil {
+			logrus.Fatal("Service " + service + " does not exists or name is invalid ! Exiting.")
+		}
+		if !isRunning {
+			logrus.Info("Service " + service + " is not running! ")
+			return false
+		}
 	}
-	if !isRunning {
-		logrus.Debug("Service " + serviceName + " is not running! ")
-		//Todo : stop listening !
-	}
+
+	return true
 }
 
-func checkVault(vaultIP string) bool {
-
-	if vaultIP == "" {
-		// Check Vault connectivity
+func getVaultsIPs(vaultIPs []string) []string {
+	if len(vaultIPs) == 0 {
+		logrus.Info("No IP provided in configuration file, trying to find Vault.ini file")
 		list, err := findVaultINIFile()
 		if err != nil {
 			logrus.Fatal("Unable to find Vault INI file")
 		}
 
-		logrus.Debug("Using Vault.ini file : " + list[0])
+		logrus.Info("Using Vault.ini file : " + list[0])
 
-		//fixme  find vault ini properly
-		vaultIP, _ = findVaultIPAddress(list[0])
+		vaultIPs, _ = findVaultIPAddress(list[0])
 	}
 
-	vaultIPs := strings.Split(vaultIP, ",")
+	logrus.Info("Using addresses : " + strings.Join(vaultIPs, ","))
+	return vaultIPs
+}
+
+func checkVault(vaultIPs []string) bool {
 
 	for _, ipAddr := range vaultIPs {
 		logrus.Debug("Testing connection to ", ipAddr)
-		err := testVaultConnectivity(ipAddr)
+		err := testConnection(ipAddr)
 		if err != nil {
 			logrus.Debug("Vault connection failed !")
-			//panic(err)
 		} else {
 			logrus.Debug("Vault connection succeeded !")
 			return true
@@ -201,43 +210,56 @@ func checkVault(vaultIP string) bool {
 	return false
 }
 
-func status() bool {
-	/*
-		path, err := os.Getwd()
-		if err != nil {
-			log.Fatal("Unable to find working directory")
-		}
+type FinalConfig struct {
+	services []string
+	vaultIPs []string
+	disks    []string
+	port     int
+}
 
-		file, err := os.OpenFile(path + "/BastionSup.log",os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-		if err != nil {
-			log.Fatal("Unable to create log file !")
-		}
-
-		defer file.Close()
-
-		log.SetOutput(file)
-	*/
-
+func initialize() FinalConfig {
+	var finalConfig FinalConfig
+	initLogger()
 	supConfig, err := getConf("src/config.yaml")
 	if err != nil {
-		logrus.Fatal("Error reading configuration file !")
-		panic(err)
+		logrus.Panic("Error reading configuration file !")
 	}
 
-	if supConfig.VaultFile == "" {
-		logrus.Info("VaultFile not mentioned in configuration file")
-	}
+	configVaultsIPs := strings.Split(supConfig.VaultFile, ",")
+	finalConfig.vaultIPs = getVaultsIPs(configVaultsIPs)
+	finalConfig.services = supConfig.Services
+	finalConfig.disks = supConfig.Disks
+	finalConfig.port = supConfig.Port
 
-	vaultConn := checkVault(supConfig.VaultFile)
-
-	logrus.Debug(supConfig.VaultFile)
-	logrus.Debug(supConfig.Services)
-
-	return vaultConn
+	return finalConfig
 
 }
 
-func main() {
-	initLogger()
-	logrus.Debug(status())
+func status(config FinalConfig) bool {
+
+	logrus.Debug("Starting health tests...")
+
+	vaultConn := checkVault(config.vaultIPs)
+	if !vaultConn {
+		logrus.Info("Connexion to Vaults failed !")
+		return false
+	}
+
+	serviceStatus := checkServices(config.services)
+	if !serviceStatus {
+		logrus.Info("Service check failed !")
+		return false
+	}
+
+	for _, disk := range config.disks {
+		diskStatus := DiskUsage(disk)
+		if !diskStatus {
+			logrus.Info("Disk " + disk + " available space is less than 10% !")
+			return false
+		}
+	}
+
+	logrus.Debug("All checks went well !")
+	return true
+
 }

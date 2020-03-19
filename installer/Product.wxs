@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="BastionSup" Language="1033" Version="1.0.0.0" Manufacturer="GLE" UpgradeCode="524bca6b-2f39-417b-966a-b55e28e800e8">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<!-- Try to include cab in the msi -->
+		<MediaTemplate EmbedCab="yes" />
+
+		<Feature Id="ProductFeature" Title="BastionSup" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="Bastion Supervision Service" />
+			</Directory>
+		</Directory>
+		<Property Id ="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+		<Property Id="INSTALLDESKTOPSHORTCUT" Value="1" />
+
+		<WixVariable Id="WixUILicenseRtf" Value="licence.rtf" />
+		<UIRef Id="WixUI_InstallDir" />
+		<!--
+		<UI>
+			<Dialog Id="MyInstallDirDlg" Width="370" Height="270" Title="Choose components">
+				<Control Id="FolderLabel" Type="Text" X="20" Y="60" Width="290" Height="30" Text="tutu" />
+				<Control Id="Folder" Type="PathEdit" X="20" Y="100" Width="320" Height="18" Property="WIXUI_INSTALLDIR" Indirect="yes" />
+				<Control Id="ChangeFolder" Type="PushButton" X="20" Y="120" Width="56" Height="17" Text="!(loc.InstallDirDlgChange)" />
+				<Control Id="DesktopShortcutCheckBox" Type="CheckBox" X="20" Y="160" Width="290" Height="17" Property="INSTALLDESKTOPSHORTCUT" CheckBoxValue="1" Text="Create a shortcut for this program on the desktop." />
+			</Dialog>
+		</UI>
+		-->
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
+			<Component Id="ProductComponent">
+				<!-- Le fichier qui contient le listener-->
+				<File Id="BastionSupGoFile" 
+					  Source="C:\Users\gleveill\Documents\Dev\go\Supervision\build\go_build_Supervision_.exe" 
+					  KeyPath="yes" />
+
+
+				<!-- Install service -->
+				<ServiceInstall Id="InstallBSUP"
+								Name="BastionSupService"
+								Description="Bastion Supervision"
+								Start="auto"
+								ErrorControl="normal"
+								Type="ownProcess"/>
+				
+				<!-- Set start/stop/remove options -->
+				<ServiceControl Id="ControllBSUP"
+								Name="BastionSupService"
+								Start="install"
+								Stop="both"
+								Remove="uninstall"
+								Wait="yes" />				
+				
+				
+				
+				<!-- <ServiceConfig ServiceName="BastionSup" OnInstall="yes" /> -->
+				
+				<!-- TODO: Insert files, registry keys, and other resources here. -->
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+	
+</Wix>

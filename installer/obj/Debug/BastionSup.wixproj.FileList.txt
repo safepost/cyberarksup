@@ -1,0 +1,6 @@
+C:\Users\gleveill\Documents\Dev\BastionSup\installer\BastionSup\bin\Debug\BastionSup.msi
+C:\Users\gleveill\Documents\Dev\BastionSup\installer\BastionSup\bin\Debug\BastionSup.wixpdb
+obj\Debug\Product.wixobj
+obj\Debug\BastionSup.wixproj.BindContentsFileListnull.txt
+obj\Debug\BastionSup.wixproj.BindOutputsFileListnull.txt
+obj\Debug\BastionSup.wixproj.BindBuiltOutputsFileListnull.txt

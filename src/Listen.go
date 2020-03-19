@@ -7,15 +7,18 @@ package main
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/kardianos/service"
 )
 
-var logger service.Logger
+//var logger service.Logger
 
 type program struct{}
 
@@ -24,14 +27,59 @@ func (p *program) Start(s service.Service) error {
 	go p.run()
 	return nil
 }
+
 func (p *program) run() {
 	// Do work here
-	listener, err := net.Listen("tcp", ":38001")
-	if err != nil {
-		panic(err)
+	config := initialize()
+	healthStatus := true
+
+	var listener net.Listener
+
+	logrus.Debug("Starting health check routine ....")
+
+	for {
+		logrus.Debug("Performing checks...")
+		if debug {
+
+			content, err := ioutil.ReadFile("status.debug")
+			if err != nil {
+				logrus.Fatal("Unable to open status.debug file")
+			}
+
+			logrus.Debug("Content read : " + string(content))
+			healthStatus = string(content) == "1"
+
+		} else {
+			healthStatus = status(config)
+		}
+
+		// check listener status
+		err := testConnection("127.0.0.1", config.port)
+		isListening := err == nil
+
+		if healthStatus {
+			if !isListening {
+				// Create listener
+				logrus.Debug("Starting Listener ")
+				listener, err = net.Listen("tcp", ":"+strconv.Itoa(config.port))
+				if err != nil {
+					logrus.Fatal("Unable to start listener !")
+				}
+			}
+		}
+
+		if !healthStatus {
+			if isListening {
+				err = listener.Close()
+				if err != nil {
+					logrus.Fatal("Unable to stop listening ! Shutting down service")
+				}
+			}
+		}
+		time.Sleep(time.Second * 10)
 	}
 
-	fmt.Println("Using port:", listener.Addr().(*net.TCPAddr).Port)
+	//	fmt.Println("Using port:", listener.Addr().(*net.TCPAddr).Port)
 }
 
 func (p *program) Stop(s service.Service) error {
@@ -62,13 +110,13 @@ func main() {
 		}
 		return
 	}
-
-	logger, err = s.Logger(nil)
-	if err != nil {
-		log.Fatal(err)
-	}
+	initLogger()
+	//logger, err = s.Logger(nil)
+	//if err != nil {
+	//	logrus.Fatal(err)
+	//}
 	err = s.Run()
 	if err != nil {
-		logger.Error(err)
+		logrus.Error(err)
 	}
 }

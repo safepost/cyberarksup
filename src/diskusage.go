@@ -2,14 +2,19 @@ package main
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/windows"
 )
 
 // disk usage of path/disk
-func DiskUsage(path string) bool {
+func DiskUsage(letter string) bool {
 	var free, total, avail uint64
 
-	path = "c:\\"
+	if len(letter) != 1 {
+		logrus.Fatal("disk in configuration file must be a valid Windows Drive (eg : C or D)")
+	}
+
+	path := letter + ":\\"
 	pathPtr, err := windows.UTF16PtrFromString(path)
 	if err != nil {
 		panic(err)
