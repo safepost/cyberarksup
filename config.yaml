@@ -5,5 +5,3 @@ vaultIniLocation: C:\Program Files\Cyberark\PSM\Vault\Vault.ini
 disks:
   - C
 listeningPort: 38001
-# comment
-#vaultIniLocation: C:\Program Files\Cyberark\PSM\Vault\Vault.ini

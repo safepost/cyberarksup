@@ -1,8 +1,23 @@
-This project aim to provide a flexible solution to add / remove your application servers into loadbalancer pools which is always a pain :)
+This project aim to provide a flexible solution to add / remove Cyberark's servers into loadbalancer pools which is always a pain :)
 
-First, indicate the IP / port you want to monitor in the configuration file
-Then list the applicative services you want to be running
+
+First list the applicative services you want to be running 
+Then, indicate the location of the Vault.ini configuration file
 Finally, give the port on which the service should listen.
 
-That's all !
-A wix installer is provided 
+A wix installer is provided but has to be compiled with Visual Studio with wix modules installed
+
+
+Sample configuration file :
+
+    services:
+      - Cyber-Ark Privileged Session Manager
+      - TermService
+    vaultIniLocation: C:\Program Files\Cyberark\PSM\Vault\Vault.ini
+    disks:
+      - C
+    listeningPort: 38001 
+
+
+
+

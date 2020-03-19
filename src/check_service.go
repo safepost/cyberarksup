@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	debug = true
+	debug = false
 )
 
 func initLogger() {
@@ -122,9 +122,7 @@ func findVaultIPAddress(iniFilePath string) ([]string, error) {
 
 func findVaultINIFile() ([]string, error) {
 	initialSearchList := [...]string{"d:\\Cyberark", "d:\\Program Files\\Cyberark", "d:\\Program Files (x86)\\CyberArk",
-		"c:\\Cyberark", "c:\\Program Files\\Cyberark", "c:\\Program Files (x86)\\CyberArk",
-		// for test purpose only !
-		"C:\\Users\\gleveill\\Documents\\Bastion\\Splunk"}
+		"c:\\Cyberark", "c:\\Program Files\\Cyberark", "c:\\Program Files (x86)\\CyberArk"}
 
 	var finalSearchList []string
 	for _, element := range initialSearchList {
@@ -220,7 +218,7 @@ type FinalConfig struct {
 func initialize() FinalConfig {
 	var finalConfig FinalConfig
 	initLogger()
-	supConfig, err := getConf("src/config.yaml")
+	supConfig, err := getConf("config.yaml")
 	if err != nil {
 		logrus.Panic("Error reading configuration file !")
 	}
