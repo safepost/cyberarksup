@@ -111,7 +111,7 @@ func testConnection(addr string, portOptional ...int) error {
 func findVaultIPAddress(iniFilePath string) ([]string, error) {
 	cfg, err := ini.Load(iniFilePath)
 	if err != nil {
-		panic(err)
+		logrus.Fatal("Unable to load ini file provided in configuration file : " + iniFilePath)
 	}
 
 	vaultIPAddresses := cfg.Section("").Key("ADDRESS").String()
@@ -174,9 +174,11 @@ func checkServices(services []string) bool {
 	return true
 }
 
-func getVaultsIPs(vaultIPs []string) []string {
-	if len(vaultIPs) == 0 {
-		logrus.Info("No IP provided in configuration file, trying to find Vault.ini file")
+func getVaultsIPs(iniFile string) []string {
+	var vaultIPs []string
+
+	if iniFile == "" {
+		logrus.Info("No file provided in configuration file, trying to find Vault.ini file")
 		list, err := findVaultINIFile()
 		if err != nil {
 			logrus.Fatal("Unable to find Vault INI file")
@@ -185,6 +187,8 @@ func getVaultsIPs(vaultIPs []string) []string {
 		logrus.Info("Using Vault.ini file : " + list[0])
 
 		vaultIPs, _ = findVaultIPAddress(list[0])
+	} else {
+		vaultIPs, _ = findVaultIPAddress(iniFile)
 	}
 
 	logrus.Info("Using addresses : " + strings.Join(vaultIPs, ","))
@@ -221,10 +225,11 @@ func initialize() FinalConfig {
 	supConfig, err := getConf("config.yaml")
 	if err != nil {
 		logrus.Panic("Error reading configuration file !")
+		//fixing ide linting bug :
+		panic(err)
 	}
 
-	configVaultsIPs := strings.Split(supConfig.VaultFile, ",")
-	finalConfig.vaultIPs = getVaultsIPs(configVaultsIPs)
+	finalConfig.vaultIPs = getVaultsIPs(supConfig.VaultFile)
 	finalConfig.services = supConfig.Services
 	finalConfig.disks = supConfig.Disks
 	finalConfig.port = supConfig.Port
