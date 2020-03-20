@@ -13,6 +13,8 @@ func status(config FinalConfig) bool {
 		return false
 	}
 
+	// latency between component and vault
+
 	// Check Services
 	serviceStatus := checkServices(config.services)
 	if !serviceStatus {
