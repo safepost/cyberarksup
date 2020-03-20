@@ -1,7 +1,9 @@
 services:
   - Cyber-Ark Privileged Session Manager
   - TermService
-vaultIniLocation: C:\Program Files\Cyberark\PSM\Vault\Vault.ini
+vaultIniLocation: C:\Users\gleveill\Documents\Dev\go\Supervision\poubelle\Vault.ini
 disks:
   - C
+  - D
 listeningPort: 38001
+logLevel: debug
