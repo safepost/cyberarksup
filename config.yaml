@@ -1,7 +1,7 @@
 services:
   - Cyber-Ark Privileged Session Manager
   - TermService
-vaultIniLocation: C:\Users\gleveill\Documents\Dev\go\Supervision\poubelle\Vault.ini
+#vaultIniLocation: Path\to\Vault.ini
 disks:
   - C
   - D

@@ -4,3 +4,5 @@ obj\Debug\Product.wixobj
 obj\Debug\BastionSup.wixproj.BindContentsFileListnull.txt
 obj\Debug\BastionSup.wixproj.BindOutputsFileListnull.txt
 obj\Debug\BastionSup.wixproj.BindBuiltOutputsFileListnull.txt
+C:\Users\gleveill\Documents\Dev\go\Supervision\installer\bin\Debug\BastionSup.msi
+C:\Users\gleveill\Documents\Dev\go\Supervision\installer\bin\Debug\BastionSup.wixpdb

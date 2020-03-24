@@ -1,2 +1,2 @@
-C:\Users\gleveill\Documents\Dev\BastionSup\installer\BastionSup\bin\Debug\BastionSup.msi
-C:\Users\gleveill\Documents\Dev\BastionSup\installer\BastionSup\bin\Debug\BastionSup.wixpdb
+C:\Users\gleveill\Documents\Dev\go\Supervision\installer\bin\Debug\BastionSup.msi
+C:\Users\gleveill\Documents\Dev\go\Supervision\installer\bin\Debug\BastionSup.wixpdb

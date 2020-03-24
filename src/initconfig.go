@@ -6,12 +6,23 @@ import (
 	"github.com/snowzach/rotatefilehook"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"time"
 )
 
 const (
 	debug = false
 )
+
+func findPath() string {
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	exPath := filepath.Dir(ex)
+	return exPath
+}
 
 func initLogger() {
 	var logLevel = logrus.InfoLevel
@@ -20,7 +31,7 @@ func initLogger() {
 	}
 
 	rotateFileHook, err := rotatefilehook.NewRotateFileHook(rotatefilehook.RotateFileConfig{
-		Filename:   "logs/console.log",
+		Filename:   findPath() + "/logs/console.log",
 		MaxSize:    50, // megabytes
 		MaxBackups: 3,
 		MaxAge:     28, //days
@@ -91,7 +102,7 @@ type FinalConfig struct {
 func initialize() FinalConfig {
 	var finalConfig FinalConfig
 	initLogger()
-	supConfig, err := getConf("config.yaml")
+	supConfig, err := getConf(findPath() + "/config.yaml")
 
 	if err != nil {
 		logrus.Panic("Error reading configuration file !")
