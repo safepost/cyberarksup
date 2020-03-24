@@ -34,13 +34,15 @@ func (p *program) run() {
 	healthStatus := true
 
 	var listener net.Listener
+	var err error
+	var isListening bool = false
 
 	logrus.Debug("Starting health check routine ....")
 
 	for {
 		logrus.Debug("Performing checks...")
 		if debug {
-
+			// in debug mode, we look in the file status.debug and if the content is 1 we considered health OK
 			content, err := ioutil.ReadFile("status.debug")
 			if err != nil {
 				logrus.Fatal("Unable to open status.debug file")
@@ -54,8 +56,8 @@ func (p *program) run() {
 		}
 
 		// check listener status
-		err := testConnection("127.0.0.1", config.port)
-		isListening := err == nil
+		//err := testConnection("127.0.0.1", config.port)
+		//isListening := err == nil
 
 		if healthStatus {
 			if !isListening {
@@ -65,15 +67,17 @@ func (p *program) run() {
 				if err != nil {
 					logrus.Fatal("Unable to start listener !")
 				}
+				isListening = true
 			}
 		}
 
 		if !healthStatus {
 			if isListening {
-				err = listener.Close()
+				err := listener.Close()
 				if err != nil {
 					logrus.Fatal("Unable to stop listening ! Shutting down service")
 				}
+				isListening = false
 			}
 		}
 		time.Sleep(time.Second * 10)
