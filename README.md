@@ -5,7 +5,7 @@ First list the applicative services you want to be running
 Then, indicate the location of the Vault.ini configuration file
 Finally, give the port on which the service should listen.
 
-A wix installer is provided but has to be compiled with Visual Studio with wix modules installed
+A wix installer is provided but has to be compiled with Visual Studio with wix modules installed or wix directly (see build.bat)
 
 
 Sample configuration file :
