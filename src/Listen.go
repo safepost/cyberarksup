@@ -88,13 +88,13 @@ func (p *program) run() {
 
 func (p *program) Stop(s service.Service) error {
 	// Stop should not block. Return with a few seconds.
-	<-time.After(time.Second * 13)
+	<-time.After(time.Second * 4)
 	return nil
 }
 
 func main() {
 
-	fmt.Printf("Running windows service")
+	fmt.Printf("Running windows service\n")
 
 	svcConfig := &service.Config{
 		Name:        "GoServiceExampleStopPause",

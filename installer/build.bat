@@ -1,5 +1,7 @@
 @echo off
 
+$env:path+=";C:\Program Files (x86)\WiX Toolset v3.11\bin"
+
 candle.exe Product.wxs
 light.exe -ext WixUIExtension .\Product.wixobj
 

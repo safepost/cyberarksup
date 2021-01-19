@@ -1,9 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/mattn/go-colorable"
+	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
-	"github.com/snowzach/rotatefilehook"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
@@ -30,29 +31,24 @@ func initLogger() {
 		logLevel = logrus.DebugLevel
 	}
 
-	rotateFileHook, err := rotatefilehook.NewRotateFileHook(rotatefilehook.RotateFileConfig{
-		Filename:   findPath() + "/logs/console.log",
-		MaxSize:    50, // megabytes
-		MaxBackups: 3,
-		MaxAge:     28, //days
-		Level:      logLevel,
-		Formatter: &logrus.JSONFormatter{
-			TimestampFormat: time.RFC822,
-		},
-	})
-
-	if err != nil {
-		logrus.Fatalf("Failed to initialize file rotate hook: %v", err)
+	pathMap := lfshook.PathMap{
+		logrus.InfoLevel:  findPath() + "/logs/info.log",
+		logrus.DebugLevel: findPath() + "/logs/debug.log",
 	}
 
 	logrus.SetLevel(logLevel)
+
 	logrus.SetOutput(colorable.NewColorableStdout())
 	logrus.SetFormatter(&logrus.TextFormatter{
 		ForceColors:     true,
 		FullTimestamp:   true,
 		TimestampFormat: time.RFC822,
 	})
-	logrus.AddHook(rotateFileHook)
+	fmt.Println("Adding hook")
+	logrus.AddHook(lfshook.NewHook(
+		pathMap,
+		&logrus.JSONFormatter{TimestampFormat: time.RFC822},
+	))
 }
 
 func setLogLevel(level string) {
@@ -101,7 +97,8 @@ type FinalConfig struct {
 
 func initialize() FinalConfig {
 	var finalConfig FinalConfig
-	initLogger()
+	//initLogger()
+	fmt.Println(findPath())
 	supConfig, err := getConf(findPath() + "/config.yaml")
 
 	if err != nil {
