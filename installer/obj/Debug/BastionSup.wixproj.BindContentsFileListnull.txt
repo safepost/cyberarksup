@@ -1,2 +1,0 @@
-C:\Users\gleveill\Documents\Dev\go\Supervision\config.yaml
-C:\Users\gleveill\Documents\Dev\go\Supervision\build\BastionSup.exe
