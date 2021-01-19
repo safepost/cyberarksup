@@ -2,3 +2,5 @@
 /logs/
 /poubelle/
 
+/installer/.vs/
+/installer/old/

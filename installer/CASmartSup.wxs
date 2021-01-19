@@ -41,7 +41,7 @@
 			<Component Id="ProductComponent">
 				<!-- Le fichier qui contient le listener-->
 				<File Id="CASmartSupGoFile" 
-					  Source="C:\Users\gleveill\Documents\Dev\go\Supervision\build\CASmartSup.exe" 
+					  Source="..\build\CASmartSup.exe"
 					  KeyPath="yes" />
 
 					  
@@ -70,7 +70,7 @@
 			</Component>
 		<Component Id="configFile">
 				<File Id="CASmartConfigFile"
-					  Source="C:\Users\gleveill\Documents\Dev\go\Supervision\config.yaml"
+					  Source="..\config.yaml"
 					  KeyPath="yes"
 					  />	
 		</Component>
