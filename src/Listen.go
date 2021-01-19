@@ -97,9 +97,9 @@ func main() {
 	fmt.Printf("Running windows service\n")
 
 	svcConfig := &service.Config{
-		Name:        "GoServiceExampleStopPause",
-		DisplayName: "Go Service Example: Stop Pause",
-		Description: "This is an example Go service that pauses on stop.",
+		Name:        "CASmartSUP",
+		DisplayName: "Cyberark Smart Supervision",
+		Description: "This service listen to port 38001 when Cyberark component is up",
 	}
 
 	prg := &program{}

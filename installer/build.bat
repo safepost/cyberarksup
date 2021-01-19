@@ -2,7 +2,7 @@
 
 $env:path+=";C:\Program Files (x86)\WiX Toolset v3.11\bin"
 
-candle.exe Product.wxs
+candle.exe CASmartSup.wxs
 light.exe -ext WixUIExtension .\Product.wixobj
 
 rem https://www.firegiant.com/wix/tutorial/getting-started/
