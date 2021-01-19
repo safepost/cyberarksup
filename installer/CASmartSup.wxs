@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="CASmartSup" Language="1033" Version="1.0.0.0" Manufacturer="GLE" UpgradeCode="524bca6b-2f39-417b-966a-b55e28e800e8">
+	<Product Id="*" Name="CASmartSup" Language="1033" Version="1.1.0.0" Manufacturer="GLE" UpgradeCode="524bca6b-2f39-417b-966a-b55e28e800e8">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
