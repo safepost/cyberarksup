@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -69,6 +70,7 @@ type SupConfig struct {
 	Disks     []string `yaml:"disks"`
 	Port      int      `yaml:"listeningPort"`
 	LogLevel  string   `yaml:"logLevel"`
+	VaultsIP  string   `yaml:"vaultsIP"`
 }
 
 // read YAML configuration file
@@ -108,8 +110,16 @@ func initialize() FinalConfig {
 	}
 
 	setLogLevel(supConfig.LogLevel)
+	if supConfig.VaultsIP != "" {
+		logrus.Debug("Vault IP were given in config file, using it :" + supConfig.VaultsIP)
 
-	finalConfig.vaultIPs = getVaultsIPs(supConfig.VaultFile)
+		finalConfig.vaultIPs = strings.Split(supConfig.VaultsIP, ",")
+		logrus.Debug(finalConfig)
+	} else {
+		logrus.Debug("Vault IP were NOT given in config file")
+		finalConfig.vaultIPs = getVaultsIPs(supConfig.VaultFile)
+	}
+
 	finalConfig.services = supConfig.Services
 	finalConfig.disks = supConfig.Disks
 	finalConfig.port = supConfig.Port

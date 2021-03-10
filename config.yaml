@@ -7,3 +7,4 @@ disks:
   - D
 listeningPort: 38001
 logLevel: debug
+#vaultsIP: 127.0.0.1,10.20.30.40

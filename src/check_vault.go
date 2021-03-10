@@ -29,7 +29,7 @@ func testConnection(addr string, portOptional ...int) error {
 
 // Find ADDRESS filed in Vault.ini file and return list of IP Address (string format)
 func findVaultIPAddress(iniFilePath string) ([]string, error) {
-	cfg, err := ini.Load(iniFilePath)
+	cfg, err := ini.InsensitiveLoad(iniFilePath)
 	if err != nil {
 		logrus.Fatal("Unable to load ini file provided in configuration file : " + iniFilePath)
 	}
@@ -101,7 +101,6 @@ func getVaultsIPs(iniFile string) []string {
 }
 
 func checkVault(vaultIPs []string) bool {
-
 	for _, ipAddr := range vaultIPs {
 		logrus.Debug("Testing connection to ", ipAddr)
 		err := testConnection(ipAddr)

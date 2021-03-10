@@ -28,6 +28,30 @@ func (p *program) Start(s service.Service) error {
 	return nil
 }
 
+//func Listener(listener net.Listener, config FinalConfig ) {
+//	var err error
+//	listener, err = net.Listen("tcp", ":"+strconv.Itoa(config.port))
+//	if err != nil {
+//		logrus.Fatal("Unable to start listener !")
+//	}
+//	defer listener.Close()
+//	for {
+//		// Wait for a connection.
+//		conn, err := listener.Accept()
+//		if err != nil {
+//			logrus.Fatal(err)
+//		}
+//
+//		// Handle the connection in a new goroutine.
+//		// The loop then returns to accepting, so that
+//		// multiple connections may be served concurrently.
+//		go func(c net.Conn) {
+//			// Shut down the connection.
+//			c.Close()
+//		}(conn)
+//	}
+//}
+
 func (p *program) run() {
 	// Do work here
 	config := initialize()
@@ -35,7 +59,7 @@ func (p *program) run() {
 
 	var listener net.Listener
 	var err error
-	var isListening bool = false
+	var isListening = false
 
 	logrus.Debug("Starting health check routine ....")
 
@@ -63,12 +87,23 @@ func (p *program) run() {
 			if !isListening {
 				// Create listener
 				logrus.Debug("Starting Listener ")
+
+				// Listener initialization
 				listener, err = net.Listen("tcp", ":"+strconv.Itoa(config.port))
 				if err != nil {
 					logrus.Fatal("Unable to start listener !")
 				}
+				defer listener.Close()
+
 				isListening = true
 			}
+
+			conn, err := listener.Accept()
+			if err != nil {
+				logrus.Fatal(err)
+			}
+			conn.Close()
+
 		}
 
 		if !healthStatus {
