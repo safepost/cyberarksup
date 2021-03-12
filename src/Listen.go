@@ -91,18 +91,22 @@ func (p *program) run() {
 				// Listener initialization
 				listener, err = net.Listen("tcp", ":"+strconv.Itoa(config.port))
 				if err != nil {
+					logrus.Info("Unable to bind on TCP port " + strconv.Itoa(config.port) + ", is that port already used ?!")
 					logrus.Fatal("Unable to start listener !")
 				}
 				defer listener.Close()
 
+				go func(l net.Listener) {
+					conn, _ := l.Accept()
+					go func(c net.Conn) {
+						logrus.Debug("Got connection, closing it !")
+						// Shut down the connection.
+						_ = c.Close()
+					}(conn)
+				}(listener)
+
 				isListening = true
 			}
-
-			conn, err := listener.Accept()
-			if err != nil {
-				logrus.Fatal(err)
-			}
-			conn.Close()
 
 		}
 

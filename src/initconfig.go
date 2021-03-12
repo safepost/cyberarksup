@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	debug = false
+	debug = true
 )
 
 func findPath() string {
