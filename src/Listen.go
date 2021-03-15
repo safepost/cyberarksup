@@ -18,8 +18,6 @@ import (
 	"github.com/kardianos/service"
 )
 
-//var logger service.Logger
-
 type program struct{}
 
 func (p *program) Start(s service.Service) error {
@@ -27,30 +25,6 @@ func (p *program) Start(s service.Service) error {
 	go p.run()
 	return nil
 }
-
-//func Listener(listener net.Listener, config FinalConfig ) {
-//	var err error
-//	listener, err = net.Listen("tcp", ":"+strconv.Itoa(config.port))
-//	if err != nil {
-//		logrus.Fatal("Unable to start listener !")
-//	}
-//	defer listener.Close()
-//	for {
-//		// Wait for a connection.
-//		conn, err := listener.Accept()
-//		if err != nil {
-//			logrus.Fatal(err)
-//		}
-//
-//		// Handle the connection in a new goroutine.
-//		// The loop then returns to accepting, so that
-//		// multiple connections may be served concurrently.
-//		go func(c net.Conn) {
-//			// Shut down the connection.
-//			c.Close()
-//		}(conn)
-//	}
-//}
 
 func (p *program) run() {
 	// Do work here
@@ -99,7 +73,6 @@ func (p *program) run() {
 				go func(l net.Listener) {
 					conn, _ := l.Accept()
 					go func(c net.Conn) {
-						logrus.Debug("Got connection, closing it !")
 						// Shut down the connection.
 						_ = c.Close()
 					}(conn)
@@ -121,7 +94,6 @@ func (p *program) run() {
 		}
 		time.Sleep(time.Second * 10)
 	}
-
 	//	fmt.Println("Using port:", listener.Addr().(*net.TCPAddr).Port)
 }
 
