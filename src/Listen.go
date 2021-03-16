@@ -26,14 +26,45 @@ func (p *program) Start(s service.Service) error {
 	return nil
 }
 
+var healthStatus bool
+
+func listen(l net.Listener, port int) {
+	var err error
+	logrus.Debug("Starting Listener ")
+	l, err = net.Listen("tcp", ":"+strconv.Itoa(port))
+	if err != nil {
+		logrus.Info("Unable to bind on TCP port " + strconv.Itoa(port) + ", is that port already used ?!")
+		logrus.Fatal("Unable to start listener !")
+	}
+
+	defer l.Close()
+	for {
+		if healthStatus == false {
+			logrus.Debug("Closing Listener !")
+			_ = l.Close()
+			return
+		}
+		logrus.Debug("Going to listen !")
+		conn, err := l.Accept()
+		if err != nil {
+			logrus.Debug("i was killed ?!")
+		}
+		go func(c net.Conn) {
+			// Shut down the connection.
+			logrus.Debug("Closing conn !")
+			_ = c.Close()
+		}(conn)
+	}
+}
+
 func (p *program) run() {
 	// Do work here
 	config := initialize()
-	healthStatus := true
+	healthStatus = true
 
 	var listener net.Listener
-	var err error
 	var isListening = false
+	//no_listen := make(chan bool)
 
 	logrus.Debug("Starting health check routine ....")
 
@@ -53,45 +84,20 @@ func (p *program) run() {
 			healthStatus = status(config)
 		}
 
-		// check listener status
-		//err := testConnection("127.0.0.1", config.port)
-		//isListening := err == nil
-
 		if healthStatus {
 			if !isListening {
-				// Create listener
-				logrus.Debug("Starting Listener ")
-
-				// Listener initialization
-				listener, err = net.Listen("tcp", ":"+strconv.Itoa(config.port))
-				if err != nil {
-					logrus.Info("Unable to bind on TCP port " + strconv.Itoa(config.port) + ", is that port already used ?!")
-					logrus.Fatal("Unable to start listener !")
-				}
-				defer listener.Close()
-
-				go func(l net.Listener) {
-					conn, _ := l.Accept()
-					go func(c net.Conn) {
-						// Shut down the connection.
-						_ = c.Close()
-					}(conn)
-				}(listener)
-
 				isListening = true
+				go listen(listener, config.port)
 			}
-
 		}
 
 		if !healthStatus {
 			if isListening {
-				err := listener.Close()
-				if err != nil {
-					logrus.Fatal("Unable to stop listening ! Shutting down service")
-				}
 				isListening = false
+				//go stop_listen(listener)
 			}
 		}
+
 		time.Sleep(time.Second * 10)
 	}
 	//	fmt.Println("Using port:", listener.Addr().(*net.TCPAddr).Port)
