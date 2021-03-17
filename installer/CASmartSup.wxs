@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="CASmartSup" Language="1033" Version="1.3.0.0" Manufacturer="GLE" UpgradeCode="524bca6b-2f39-417b-966a-b55e28e800e8">
+	<Product Id="*" Name="CASmartSup" Language="1033" Version="1.4.0.0" Manufacturer="GLE" UpgradeCode="524bca6b-2f39-417b-966a-b55e28e800e8">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
@@ -68,11 +68,19 @@
 				
 				<!-- TODO: Insert files, registry keys, and other resources here. -->
 			</Component>
-		<Component Id="configFile">
+		<Component Id="configFile" NeverOverwrite="yes">
 				<File Id="CASmartConfigFile"
 					  Source="..\config.yaml"
 					  KeyPath="yes"
 					  />	
+		</Component>
+		
+		<Component Id="demoConfigFile">
+		<File Id="CASmartDemoConfigFile"
+			  Source="..\config.yaml"
+			  Name="config.yaml.sample"
+			  KeyPath="yes"
+			  />	
 		</Component>
 		</ComponentGroup>
 	</Fragment>

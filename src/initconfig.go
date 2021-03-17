@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/mattn/go-colorable"
 	"github.com/rifflock/lfshook"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
@@ -27,39 +27,39 @@ func findPath() string {
 }
 
 func initLogger() {
-	var logLevel = logrus.InfoLevel
+	var logLevel = log.InfoLevel
 	if debug {
-		logLevel = logrus.DebugLevel
+		logLevel = log.DebugLevel
 	}
 
 	pathMap := lfshook.PathMap{
-		logrus.InfoLevel:  findPath() + "/logs/info.log",
-		logrus.DebugLevel: findPath() + "/logs/debug.log",
+		log.InfoLevel:  findPath() + "/logs/info.log",
+		log.DebugLevel: findPath() + "/logs/debug.log",
 	}
 
-	logrus.SetLevel(logLevel)
+	log.SetLevel(logLevel)
 
-	logrus.SetOutput(colorable.NewColorableStdout())
-	logrus.SetFormatter(&logrus.TextFormatter{
+	log.SetOutput(colorable.NewColorableStdout())
+	log.SetFormatter(&log.TextFormatter{
 		ForceColors:     true,
 		FullTimestamp:   true,
 		TimestampFormat: time.RFC822,
 	})
 	fmt.Println("Adding hook")
-	logrus.AddHook(lfshook.NewHook(
+	log.AddHook(lfshook.NewHook(
 		pathMap,
-		&logrus.JSONFormatter{TimestampFormat: time.RFC822},
+		&log.JSONFormatter{TimestampFormat: time.RFC822},
 	))
 }
 
 func setLogLevel(level string) {
 	switch level {
 	case "debug":
-		logrus.SetLevel(logrus.DebugLevel)
+		log.SetLevel(log.DebugLevel)
 	case "info":
-		logrus.SetLevel(logrus.InfoLevel)
+		log.SetLevel(log.InfoLevel)
 	default:
-		logrus.Info("Invalid log level given in configuration file, using info (valid values " +
+		log.Info("Invalid log level given in configuration file, using info (valid values " +
 			"are debug or info")
 	}
 }
@@ -77,14 +77,14 @@ type SupConfig struct {
 func getConf(fileName string) (SupConfig, error) {
 	confFile, err := ioutil.ReadFile(fileName)
 	if err != nil {
-		logrus.Fatal("Unable to read configuration file")
+		log.Fatal("Unable to read configuration file")
 	}
 	var supConfig SupConfig
 
 	err = yaml.Unmarshal(confFile, &supConfig)
 	if err != nil {
 		// probably not valid yaml file
-		logrus.Fatal("probably not valid yaml file")
+		log.Fatal("probably not valid yaml file")
 	}
 
 	return supConfig, nil
@@ -99,24 +99,20 @@ type FinalConfig struct {
 
 func initialize() FinalConfig {
 	var finalConfig FinalConfig
-	//initLogger()
 	fmt.Println(findPath())
 	supConfig, err := getConf(findPath() + "/config.yaml")
 
 	if err != nil {
-		logrus.Panic("Error reading configuration file !")
-		//fixing ide linting bug :
+		log.Fatal("Error reading configuration file !")
 		panic(err)
 	}
 
 	setLogLevel(supConfig.LogLevel)
 	if supConfig.VaultsIP != "" {
-		logrus.Debug("Vault IP were given in config file, using it :" + supConfig.VaultsIP)
-
+		log.Debug("Vault IP were given in config file, using it :" + supConfig.VaultsIP)
 		finalConfig.vaultIPs = strings.Split(supConfig.VaultsIP, ",")
-		logrus.Debug(finalConfig)
 	} else {
-		logrus.Debug("Vault IP were NOT given in config file")
+		log.Debug("Vault IP were NOT given in config file")
 		finalConfig.vaultIPs = getVaultsIPs(supConfig.VaultFile)
 	}
 

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/sirupsen/logrus"
 )
 
@@ -12,7 +11,6 @@ func status(config FinalConfig) bool {
 	// Check Vault
 	vaultConn := checkVault(config.vaultIPs)
 	if !vaultConn {
-		fmt.Println("Connexion to Vaults failed !")
 		logrus.Info("Connexion to Vaults failed !")
 		return false
 	}

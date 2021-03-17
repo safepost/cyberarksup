@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/mgr"
 )
@@ -21,26 +21,23 @@ func checkRunningService(serviceName string, manager *mgr.Mgr) (bool, error) {
 }
 
 func checkServices(services []string) bool {
-
 	// Check running services
 	manager, err := mgr.Connect()
 	if err != nil {
-		logrus.Info("Unable to connect to service manager !")
-		return false
-		//panic(err)
+		log.Panic("Unable to connect to service manager !")
 	}
 	defer manager.Disconnect()
 
 	for _, service := range services {
 		isRunning, err := checkRunningService(service, manager)
 		if err != nil {
-			logrus.Fatal("Service " + service + " does not exists or name is invalid ! Exiting.")
+			log.Panic("Service " + service + " does not exists or name is invalid ! Exiting.")
+			panic(err)
 		}
 		if !isRunning {
-			logrus.Info("Service " + service + " is not running! ")
+			log.Info("Service " + service + " is not running! ")
 			return false
 		}
 	}
-
 	return true
 }
