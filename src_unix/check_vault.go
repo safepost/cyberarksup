@@ -63,7 +63,7 @@ func findVaultINIFile() ([]string, error) {
 	var fileList []string
 	for _, validPath := range finalSearchList {
 		e := filepath.Walk(validPath, func(path string, f os.FileInfo, err error) error {
-			if strings.Contains(path, "Vault\\Vault.ini") {
+			if strings.Contains(path, "Vault/Vault.ini") {
 				fileList = append(fileList, path)
 			}
 			return nil

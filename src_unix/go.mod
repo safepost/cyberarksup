@@ -1,4 +1,4 @@
-module casmartsup
+module casmartsup_unix
 
 go 1.13
 

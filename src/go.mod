@@ -1,4 +1,4 @@
-module casmartsup
+module casmartsup_win
 
 go 1.13
 
