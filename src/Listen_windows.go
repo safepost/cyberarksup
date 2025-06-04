@@ -1,6 +1,5 @@
-// Copyright 2015 Daniel Theophanes.
-// Use of this source code is governed by a zlib-style
-// license that can be found in the LICENSE file.
+//go:build windows
+// +build windows
 
 package main
 
@@ -98,8 +97,8 @@ func (p *program) Stop(s service.Service) error {
 
 func main() {
 	svcConfig := &service.Config{
-		Name:        "CASmartSUP",
-		DisplayName: "Cyberark Smart Supervision",
+		Name:        "Cyberark Supervision",
+		DisplayName: "Cyberark Supervision Service",
 		Description: "This service listen to port 38001 when Cyberark component is up",
 	}
 

@@ -1,3 +1,6 @@
+//go:build linux
+// +build linux
+
 package main
 
 import (
@@ -21,7 +24,7 @@ const (
 	port = ":9977"
 )
 
-//    dependencies that are NOT required by the service, but might be used
+// dependencies that are NOT required by the service, but might be used
 var dependencies = []string{"dummy.service"}
 
 // Service has embedded daemon

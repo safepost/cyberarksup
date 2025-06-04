@@ -1,3 +1,6 @@
+//go:build windows
+// +build windows
+
 package main
 
 import (
@@ -40,7 +43,8 @@ func findVaultIPAddress(iniFilePath string) ([]string, error) {
 }
 
 func findVaultINIFile() ([]string, error) {
-	initialSearchList := [...]string{"/etc/opt/"}
+	initialSearchList := [...]string{"d:\\Cyberark", "d:\\Program Files\\Cyberark", "d:\\Program Files (x86)\\CyberArk",
+		"c:\\Cyberark", "c:\\Program Files\\Cyberark", "c:\\Program Files (x86)\\CyberArk", "d:"}
 
 	var finalSearchList []string
 	for _, element := range initialSearchList {
@@ -63,7 +67,7 @@ func findVaultINIFile() ([]string, error) {
 	var fileList []string
 	for _, validPath := range finalSearchList {
 		e := filepath.Walk(validPath, func(path string, f os.FileInfo, err error) error {
-			if strings.Contains(path, "Vault/Vault.ini") {
+			if strings.Contains(path, "Vault\\Vault.ini") {
 				fileList = append(fileList, path)
 			}
 			return nil
