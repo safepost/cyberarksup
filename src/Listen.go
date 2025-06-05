@@ -58,8 +58,6 @@ func (p *program) run() {
 	log.Debug("Starting health check routine ....")
 
 	for {
-		log.Debug("Starting checks...")
-
 		if healthcheck(config) {
 			if listener == nil {
 				var err error

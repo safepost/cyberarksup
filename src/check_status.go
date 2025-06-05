@@ -1,40 +1,43 @@
 package main
 
 import (
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 func status(config FinalConfig) bool {
-
-	logrus.Debug("Starting health tests...")
 	timeout := config.getVaultTimeOutDuration()
 
 	// Check Vault
 	vaultConn := checkVault(config.vaultIPs, timeout)
 	if !vaultConn {
-		logrus.Info("Connexion to Vaults failed !")
+		log.Info("[FAIL] Connexion to Vaults failed !")
 		return false
+	} else {
+		log.Debug(fmt.Sprintf("[PASS] Connexion to Vault succeeded, IP [%s]", config.vaultIPs))
 	}
-
-	// latency between component and vault
 
 	// Check Services
 	serviceStatus := checkServices(config.services)
 	if !serviceStatus {
-		logrus.Info("Service check failed !")
+		log.Info("[FAIL] Service check failed !")
 		return false
+	} else {
+		log.Debug(fmt.Sprintf("[PASS] Configured services were running"))
 	}
 
 	// Check Disks
 	for _, disk := range config.disks {
 		diskStatus := DiskUsage(disk)
 		if !diskStatus {
-			logrus.Info("Disk " + disk + " available space is less than 10% !")
+			log.Info("Disk " + disk + " available space is less than 10% !")
 			return false
+		}
+		else {
+			log.Debug(fmt.Sprintf("[PASS] Disk usage check passed"))
 		}
 	}
 
-	logrus.Debug("All checks went well.")
+	logrus.Debug("[SUCCESS] All checks went well.")
 	return true
 
 }
