@@ -2,6 +2,7 @@ package main
 
 import (
 	log "github.com/sirupsen/logrus"
+	"fmt"
 )
 
 func status(config FinalConfig) bool {
@@ -31,13 +32,12 @@ func status(config FinalConfig) bool {
 		if !diskStatus {
 			log.Info("Disk " + disk + " available space is less than 10% !")
 			return false
-		}
-		else {
+		} else {
 			log.Debug(fmt.Sprintf("[PASS] Disk usage check passed"))
 		}
 	}
 
-	logrus.Debug("[SUCCESS] All checks went well.")
+	log.Debug("[SUCCESS] All checks went well.")
 	return true
 
 }

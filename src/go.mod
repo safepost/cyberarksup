@@ -1,4 +1,4 @@
-module casmartsup
+module cyberarksup
 
 go 1.24
 
@@ -18,5 +18,5 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/stretchr/testify v1.7.0 // indirect
+	github.com/takama/daemon v1.0.0 // indirect
 )
-
