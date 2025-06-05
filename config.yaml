@@ -8,3 +8,5 @@ disks:
 listeningPort: 38001
 logLevel: debug
 #vaultsIP: 127.0.0.1,10.20.30.40
+healthCheckInterval: 10  # seconds
+connectionTimeout: 5     # seconds for vault connections

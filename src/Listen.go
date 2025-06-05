@@ -1,12 +1,8 @@
-//go:build windows
-// +build windows
-
 package main
 
 import (
 	"github.com/kardianos/service"
 	log "github.com/sirupsen/logrus"
-	"io/ioutil"
 	"net"
 	"os"
 	"strconv"
@@ -40,7 +36,7 @@ func accept(l net.Listener, done chan struct{}) {
 func healthcheck(config FinalConfig) bool {
 	if debug {
 		// in debug mode, we look in the file status.debug and if the content is 1 we considered health OK
-		content, err := ioutil.ReadFile("status.debug")
+		content, err := os.ReadFile("status.debug")
 		if err != nil {
 			log.Fatal("Unable to open status.debug file")
 		}
@@ -62,7 +58,7 @@ func (p *program) run() {
 	log.Debug("Starting health check routine ....")
 
 	for {
-		log.Debug("Performing checks...")
+		log.Debug("Starting checks...")
 
 		if healthcheck(config) {
 			if listener == nil {
@@ -85,7 +81,7 @@ func (p *program) run() {
 				listener = nil
 			}
 		}
-		time.Sleep(time.Second * 10)
+		time.Sleep(config.getHealthCheckDuration())
 	}
 }
 

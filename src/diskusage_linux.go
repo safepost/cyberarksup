@@ -1,5 +1,4 @@
 //go:build linux
-// +build linux
 
 package main
 
@@ -20,21 +19,28 @@ func DiskUsage(path string) bool {
 	var stat unix.Statfs_t
 	err := unix.Statfs(path, &stat)
 	if err != nil {
-		log.Error("Unable to get info from disk")
+		log.Error("Unable to get filesystem info for: " + path)
+		return false
 	}
 
-	avail = stat.Bavail * uint64(stat.Bsize)
-	total = stat.Bfree * uint64(stat.Bsize)
-	// fmt.Println(r1, r2, lastErr)
-	log.Debug((float64(avail) / float64(total)) * 100)
+	total := stat.Blocks * uint64(stat.Bsize)
+	free := stat.Bfree * uint64(stat.Bsize)   // Espace libre total (incluant réservé)
+	avail := stat.Bavail * uint64(stat.Bsize) // Espace disponible pour utilisateurs non-root
+	used := total - free
+
+	percentageUsed := (float64(used) / float64(total)) * 100
+	percentageAvailable := (float64(avail) / float64(total)) * 100
+
+	log.Debug(fmt.Sprintf("Path %s:", path))
+	log.Debug(fmt.Sprintf("  Total: %s, Used: %s (%.1f%%), Available: %s (%.1f%%)",
+		formatBytes(total),
+		formatBytes(used),
+		percentageUsed,
+		formatBytes(avail),
+		percentageAvailable))
+	log.Debug(fmt.Sprintf("  Filesystem info - Blocks: %d, Block size: %d bytes, Free blocks: %d",
+		stat.Blocks, stat.Bsize, stat.Bfree))
 
 	// return True if free space is greater than 10%
-	return (float64(avail)/float64(total))*100 > 10
+	return percentageAvailable > 10
 }
-
-const (
-	B  = 1
-	KB = 1024 * B
-	MB = 1024 * KB
-	GB = 1024 * MB
-)

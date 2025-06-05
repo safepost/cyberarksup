@@ -6,7 +6,6 @@ import (
 	"github.com/rifflock/lfshook"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -65,17 +64,19 @@ func setLogLevel(level string) {
 }
 
 type SupConfig struct {
-	Services  []string `yaml:"services"`
-	VaultFile string   `yaml:"vaultIniLocation"`
-	Disks     []string `yaml:"disks"`
-	Port      int      `yaml:"listeningPort"`
-	LogLevel  string   `yaml:"logLevel"`
-	VaultsIP  string   `yaml:"vaultsIP"`
+	Services            []string `yaml:"services"`
+	VaultFile           string   `yaml:"vaultIniLocation"`
+	Disks               []string `yaml:"disks"`
+	Port                int      `yaml:"listeningPort"`
+	HealthCheckInterval int      `yaml:"healthCheckInterval"`
+	ConnectionTimeout   int      `yaml:"connectionTimeout"`
+	LogLevel            string   `yaml:"logLevel"`
+	VaultsIP            string   `yaml:"vaultsIP"`
 }
 
-// read YAML configuration file
+// read the YAML configuration file
 func getConf(fileName string) (SupConfig, error) {
-	confFile, err := ioutil.ReadFile(fileName)
+	confFile, err := os.ReadFile(fileName)
 	if err != nil {
 		log.Fatal("Unable to read configuration file")
 	}
@@ -83,7 +84,7 @@ func getConf(fileName string) (SupConfig, error) {
 
 	err = yaml.Unmarshal(confFile, &supConfig)
 	if err != nil {
-		// probably not valid yaml file
+		// probably not a valid YAML file
 		log.Fatal("probably not valid yaml file")
 	}
 
@@ -91,10 +92,12 @@ func getConf(fileName string) (SupConfig, error) {
 }
 
 type FinalConfig struct {
-	services []string
-	vaultIPs []string
-	disks    []string
-	port     int
+	services            []string
+	vaultIPs            []string
+	disks               []string
+	port                int
+	HealthCheckInterval int
+	ConnectionTimeout   int
 }
 
 func initialize() FinalConfig {
@@ -103,8 +106,24 @@ func initialize() FinalConfig {
 	supConfig, err := getConf(findPath() + "/config.yaml")
 
 	if err != nil {
-		log.Fatal("Error reading configuration file !")
-		panic(err)
+		log.Fatal("Error reading configuration file: ", err)
+	}
+
+	// Validate configuration
+	if supConfig.Port <= 0 || supConfig.Port > 65535 {
+		log.Fatal("Invalid port number in configuration")
+	}
+
+	if supConfig.HealthCheckInterval <= 1 || supConfig.HealthCheckInterval > 500 {
+		log.Fatal("healthCheckInterval should be an integer between 1 and 500 (seconds)")
+	}
+
+	if supConfig.ConnectionTimeout <= 1 || supConfig.ConnectionTimeout > 50 {
+		log.Fatal("connectionTimeout should be an integer between 1 and 50 (seconds)")
+	}
+
+	if len(supConfig.Services) == 0 {
+		log.Warn("No services configured for monitoring")
 	}
 
 	setLogLevel(supConfig.LogLevel)
@@ -119,7 +138,17 @@ func initialize() FinalConfig {
 	finalConfig.services = supConfig.Services
 	finalConfig.disks = supConfig.Disks
 	finalConfig.port = supConfig.Port
+	finalConfig.HealthCheckInterval = supConfig.HealthCheckInterval
+	finalConfig.ConnectionTimeout = supConfig.ConnectionTimeout
 
 	return finalConfig
 
+}
+
+func (c FinalConfig) getHealthCheckDuration() time.Duration {
+	return time.Duration(c.HealthCheckInterval) * time.Second
+}
+
+func (c FinalConfig) getVaultTimeOutDuration() time.Duration {
+	return time.Duration(c.ConnectionTimeout) * time.Second
 }

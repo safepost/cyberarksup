@@ -4,6 +4,7 @@
 package main
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sys/windows"
 	"os"
@@ -28,17 +29,15 @@ func DiskUsage(letter string) bool {
 	}
 	err = windows.GetDiskFreeSpaceEx(pathPtr, &free, &total, &avail)
 
-	// fmt.Println(r1, r2, lastErr)
-	log.Debug("Free:", free, "  Total:", total, "  Available:", avail)
-	log.Debug((float64(avail) / float64(total)) * 100)
+	percentageAvailable := (float64(avail) / float64(total)) * 100
+
+	log.Debug(fmt.Sprintf("Drive %s: - Free: %s, Total: %s, Available: %s (%.1f%%)",
+		letter,
+		formatBytes(free),
+		formatBytes(total),
+		formatBytes(avail),
+		percentageAvailable))
 
 	// return True if free space is greater than 10%
-	return (float64(avail)/float64(total))*100 > 10
+	return percentageAvailable > 10
 }
-
-const (
-	B  = 1
-	KB = 1024 * B
-	MB = 1024 * KB
-	GB = 1024 * MB
-)
