@@ -14,7 +14,7 @@ import (
 
 type program struct{}
 
-func (p *program) Start(s service.Service) error {
+func (p *program) Start(service.Service) error {
 	go p.run()
 	return nil
 }
@@ -53,7 +53,7 @@ func (p *program) run() {
 	}
 }
 
-func (p *program) Stop(s service.Service) error {
+func (p *program) Stop(service.Service) error {
 	// Stop should not block. Return with a few seconds.
 	<-time.After(time.Second * 4)
 	return nil
