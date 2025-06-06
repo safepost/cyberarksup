@@ -32,14 +32,20 @@ func initLogger() {
 		logLevel = log.DebugLevel
 	}
 
+	// Create the log folder if it does not exist
+	logsDir := filepath.Join(findPath(), "logs")
+	if err := os.MkdirAll(logsDir, 0755); err != nil {
+		log.Fatal("Unable to create the log folder if it does not exist: ", err)
+	}
+
 	infoPathMap := lfshook.PathMap{
 		log.InfoLevel: findPath() + "/logs/CyberarkSupervision.log",
 	}
 
 	// PathMap supplémentaire pour écrire info ET debug dans debug.log
 	debugPathMap := lfshook.PathMap{
-		log.InfoLevel:  findPath() + "/logs/CyberarkSupervision_debug.log", // Logs info aussi dans debug.log
-		log.DebugLevel: findPath() + "/logs/CyberarkSupervision_debug.log", // Logs debug dans debug.log
+		log.InfoLevel:  findPath() + "/logs/CyberarkSupervision_debug.log",
+		log.DebugLevel: findPath() + "/logs/CyberarkSupervision_debug.log",
 	}
 
 	log.SetLevel(logLevel)
