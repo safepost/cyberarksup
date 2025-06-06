@@ -5,9 +5,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sys/windows"
-	"os"
 )
 
 // disk usage of path/disk
@@ -28,6 +29,10 @@ func DiskUsage(letter string) bool {
 		panic(err)
 	}
 	err = windows.GetDiskFreeSpaceEx(pathPtr, &free, &total, &avail)
+	if err != nil {
+		log.Error("Unable to compute freespace for disk : " + letter)
+		return false
+	}
 
 	percentageAvailable := (float64(avail) / float64(total)) * 100
 

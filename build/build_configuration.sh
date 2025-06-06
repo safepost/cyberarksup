@@ -1,5 +1,5 @@
 # Build for Windows
-GOOS=windows GOARCH=amd64 go build -o CyberarkSupervision.exe
+GOOS=windows GOARCH=amd64 go build -o ../build/windows/CyberarkSupervision.exe
 
 # Build for Linux
 GOOS=linux GOARCH=amd64 go build -o CyberarkSupervision
