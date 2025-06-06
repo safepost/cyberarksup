@@ -100,6 +100,10 @@ func (service *Service) Manage() (string, error) {
 // Accept a client connection and collect it in a channel
 
 func main() {
+
+	// TODO : Specific files for Linux	 ?
+	initLogger()
+
 	srv, err := daemon.New(name, description, daemon.SystemDaemon, dependencies...)
 	if err != nil {
 		log.Error("Error: ", err)

@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/mattn/go-colorable"
-	"github.com/rifflock/lfshook"
-	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/mattn/go-colorable"
+	"github.com/rifflock/lfshook"
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -40,15 +41,16 @@ func initLogger() {
 
 	log.SetOutput(colorable.NewColorableStdout())
 	log.SetFormatter(&log.TextFormatter{
-		ForceColors:     true,
-		FullTimestamp:   true,
+		//	ForceColors:     true,
+		//	FullTimestamp:   true,
 		TimestampFormat: time.RFC822,
 	})
-	fmt.Println("Adding hook")
+	// fmt.Println("Adding hook")
 	log.AddHook(lfshook.NewHook(
 		pathMap,
 		&log.JSONFormatter{TimestampFormat: time.RFC822},
 	))
+
 }
 
 func setLogLevel(level string) {

@@ -1,8 +1,9 @@
 package main
 
 import (
-	log "github.com/sirupsen/logrus"
 	"fmt"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func status(config FinalConfig) bool {
@@ -23,7 +24,7 @@ func status(config FinalConfig) bool {
 		log.Info("[FAIL] Service check failed !")
 		return false
 	} else {
-		log.Debug(fmt.Sprintf("[PASS] Configured services were running"))
+		log.Debug("[PASS] Configured services were running")
 	}
 
 	// Check Disks
@@ -33,11 +34,12 @@ func status(config FinalConfig) bool {
 			log.Info("Disk " + disk + " available space is less than 10% !")
 			return false
 		} else {
-			log.Debug(fmt.Sprintf("[PASS] Disk usage check passed"))
+			log.Debug("[PASS] Disk usage check passed")
 		}
 	}
 
 	log.Debug("[SUCCESS] All checks went well.")
+	log.Info("[SUCCESS] All checks went well.")
 	return true
 
 }
