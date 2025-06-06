@@ -33,13 +33,13 @@ func initLogger() {
 	}
 
 	infoPathMap := lfshook.PathMap{
-		log.InfoLevel: findPath() + "/logs/info.log",
+		log.InfoLevel: findPath() + "/logs/CyberarkSupervision.log",
 	}
 
 	// PathMap supplémentaire pour écrire info ET debug dans debug.log
 	debugPathMap := lfshook.PathMap{
-		log.InfoLevel:  findPath() + "/logs/debug.log", // Logs info aussi dans debug.log
-		log.DebugLevel: findPath() + "/logs/debug.log", // Logs debug dans debug.log
+		log.InfoLevel:  findPath() + "/logs/CyberarkSupervision_debug.log", // Logs info aussi dans debug.log
+		log.DebugLevel: findPath() + "/logs/CyberarkSupervision_debug.log", // Logs debug dans debug.log
 	}
 
 	log.SetLevel(logLevel)
@@ -50,7 +50,7 @@ func initLogger() {
 		FullTimestamp:   true,
 		TimestampFormat: time.RFC822,
 	})
-	// fmt.Println("Adding hook")
+
 	log.AddHook(lfshook.NewHook(
 		infoPathMap,
 		&log.JSONFormatter{TimestampFormat: time.RFC822},
