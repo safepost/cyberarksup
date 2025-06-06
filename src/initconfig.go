@@ -14,8 +14,14 @@ import (
 )
 
 const (
-	debug = false
+	DefaultConfigFile = "config.yaml"
+	DefaultLogsDir    = "logs"
+	DefaultInfoLog    = "CyberarkSupervision.log"
+	DefaultDebugLog   = "CyberarkSupervision_debug.log"
 )
+
+// If the DEBUG environment variable is set to true, we will not perform checks
+var debug = os.Getenv("DEBUG") == "true"
 
 func findPath() string {
 	ex, err := os.Executable()
@@ -33,19 +39,19 @@ func initLogger() {
 	}
 
 	// Create the log folder if it does not exist
-	logsDir := filepath.Join(findPath(), "logs")
+	logsDir := filepath.Join(findPath(), DefaultLogsDir)
 	if err := os.MkdirAll(logsDir, 0755); err != nil {
 		log.Fatal("Unable to create the log folder if it does not exist: ", err)
 	}
 
 	infoPathMap := lfshook.PathMap{
-		log.InfoLevel: findPath() + "/logs/CyberarkSupervision.log",
+		log.InfoLevel: filepath.Join(findPath(), logsDir, DefaultInfoLog),
 	}
 
 	// PathMap supplémentaire pour écrire info ET debug dans debug.log
 	debugPathMap := lfshook.PathMap{
-		log.InfoLevel:  findPath() + "/logs/CyberarkSupervision_debug.log",
-		log.DebugLevel: findPath() + "/logs/CyberarkSupervision_debug.log",
+		log.InfoLevel:  filepath.Join(findPath(), logsDir, DefaultDebugLog),
+		log.DebugLevel: filepath.Join(findPath(), logsDir, DefaultDebugLog),
 	}
 
 	log.SetLevel(logLevel)
@@ -94,16 +100,15 @@ type SupConfig struct {
 
 // read the YAML configuration file
 func getConf(fileName string) (SupConfig, error) {
-	confFile, err := os.ReadFile(fileName)
-	if err != nil {
-		log.Fatal("Unable to read configuration file")
-	}
 	var supConfig SupConfig
 
-	err = yaml.Unmarshal(confFile, &supConfig)
+	confFile, err := os.ReadFile(fileName)
 	if err != nil {
-		// probably not a valid YAML file
-		log.Fatal("probably not valid yaml file")
+		return supConfig, fmt.Errorf("unable to read configuration file %s: %w", fileName, err)
+	}
+
+	if err := yaml.Unmarshal(confFile, &supConfig); err != nil {
+		return supConfig, fmt.Errorf("invalid YAML format: %w", err)
 	}
 
 	return supConfig, nil
@@ -121,7 +126,7 @@ type FinalConfig struct {
 func initialize() FinalConfig {
 	var finalConfig FinalConfig
 	fmt.Println(findPath())
-	supConfig, err := getConf(findPath() + "/config.yaml")
+	supConfig, err := getConf(findPath() + "/" + DefaultConfigFile)
 
 	if err != nil {
 		log.Fatal("Error reading configuration file: ", err)
