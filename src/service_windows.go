@@ -3,46 +3,20 @@
 package main
 
 import (
-	"github.com/kardianos/service"
-	log "github.com/sirupsen/logrus"
 	"net"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/kardianos/service"
+	log "github.com/sirupsen/logrus"
 )
 
+type program struct{}
 
-func accept(l net.Listener, done chan struct{}) {
-	for {
-		conn, err := l.Accept()
-		select {
-		case <-done:
-			return
-		default:
-		}
-		if err != nil {
-			panic(err)
-		}
-		go func(c net.Conn) {
-			_ = c.Close()
-		}(conn)
-	}
-}
-
-func healthcheck(config FinalConfig) bool {
-	if debug {
-		// in debug mode, we look in the file status.debug and if the content is 1 we considered health OK
-		content, err := os.ReadFile("status.debug")
-		if err != nil {
-			log.Fatal("Unable to open status.debug file")
-		}
-
-		log.Debug("Content read : " + string(content))
-		return string(content) == "1"
-
-	} else {
-		return status(config)
-	}
+func (p *program) Start(s service.Service) error {
+	go p.run()
+	return nil
 }
 
 func (p *program) run() {
@@ -100,7 +74,7 @@ func main() {
 		log.Fatal(err)
 	}
 	if len(os.Args) > 1 {
-		err = service.Control(s, os.Args[1])
+		err := service.Control(s, os.Args[1])
 		if err != nil {
 			log.Fatal(err)
 		}

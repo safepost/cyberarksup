@@ -1,37 +1,11 @@
 package main
 
 import (
-	"github.com/kardianos/service"
-	log "github.com/sirupsen/logrus"
 	"net"
 	"os"
-	"strconv"
-	"time"
+
+	log "github.com/sirupsen/logrus"
 )
-
-type program struct{}
-
-func (p *program) Start(s service.Service) error {
-	go p.run()
-	return nil
-}
-
-func accept(l net.Listener, done chan struct{}) {
-	for {
-		conn, err := l.Accept()
-		select {
-		case <-done:
-			return
-		default:
-		}
-		if err != nil {
-			panic(err)
-		}
-		go func(c net.Conn) {
-			_ = c.Close()
-		}(conn)
-	}
-}
 
 func healthcheck(config FinalConfig) bool {
 	if debug {
@@ -49,70 +23,19 @@ func healthcheck(config FinalConfig) bool {
 	}
 }
 
-func (p *program) run() {
-	config := initialize()
-
-	var listener net.Listener
-	var done chan struct{}
-
-	log.Debug("Starting health check routine ....")
-
+func accept(l net.Listener, done chan struct{}) {
 	for {
-		if healthcheck(config) {
-			if listener == nil {
-				var err error
-				listener, err = net.Listen("tcp", ":"+strconv.Itoa(config.port))
-				if err != nil {
-					panic(err)
-				}
-				done = make(chan struct{})
-				go accept(listener, done)
-			}
-		} else {
-			if listener != nil {
-				close(done)
-				err := listener.Close()
-				if err != nil {
-					panic(err)
-				}
-				done = nil
-				listener = nil
-			}
+		conn, err := l.Accept()
+		select {
+		case <-done:
+			return
+		default:
 		}
-		time.Sleep(config.getHealthCheckDuration())
-	}
-}
-
-func (p *program) Stop(s service.Service) error {
-	// Stop should not block. Return with a few seconds.
-	<-time.After(time.Second * 4)
-	return nil
-}
-
-func main() {
-	svcConfig := &service.Config{
-		Name:        "Cyberark Supervision",
-		DisplayName: "Cyberark Supervision Service",
-		Description: "This service listen to port 38001 when Cyberark component is up",
-	}
-
-	initLogger()
-
-	prg := &program{}
-	s, err := service.New(prg, svcConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if len(os.Args) > 1 {
-		err = service.Control(s, os.Args[1])
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
-		return
-	}
-
-	err = s.Run()
-	if err != nil {
-		log.Error(err)
+		go func(c net.Conn) {
+			_ = c.Close()
+		}(conn)
 	}
 }

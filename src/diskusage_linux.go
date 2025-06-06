@@ -3,14 +3,15 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
-	"os"
 )
 
 // disk usage of path/disk
 func DiskUsage(path string) bool {
-	var total, avail uint64
 
 	if stat, err := os.Stat(path); err != nil || !stat.IsDir() {
 		log.Panic("Disk in configuration file must be a valid mount point " + path)

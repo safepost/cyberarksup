@@ -5,9 +5,11 @@ package main
 
 import (
 	"fmt"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/takama/daemon"
-	"io/ioutil"
+
+	//	"io/ioutil"
 	"net"
 	"os"
 	"strconv"
@@ -31,7 +33,6 @@ var dependencies = []string{"dummy.service"}
 type Service struct {
 	daemon.Daemon
 }
-
 
 // Manage by daemon commands or run the daemon
 func (service *Service) Manage() (string, error) {
@@ -93,7 +94,7 @@ func (service *Service) Manage() (string, error) {
 	}
 
 	// never happen, but need to complete code
-	return usage, nil
+	// return usage, nil
 }
 
 // Accept a client connection and collect it in a channel
