@@ -46,7 +46,6 @@ func checkVault(vaultIPs []string, timeout time.Duration) bool {
 			return true
 		}
 	}
-
 	return false
 }
 

@@ -32,22 +32,30 @@ func initLogger() {
 		logLevel = log.DebugLevel
 	}
 
-	pathMap := lfshook.PathMap{
-		log.InfoLevel:  findPath() + "/logs/info.log",
-		log.DebugLevel: findPath() + "/logs/debug.log",
+	infoPathMap := lfshook.PathMap{
+		log.InfoLevel: findPath() + "/logs/info.log",
+	}
+
+	// PathMap supplémentaire pour écrire info ET debug dans debug.log
+	debugPathMap := lfshook.PathMap{
+		log.InfoLevel:  findPath() + "/logs/debug.log", // Logs info aussi dans debug.log
+		log.DebugLevel: findPath() + "/logs/debug.log", // Logs debug dans debug.log
 	}
 
 	log.SetLevel(logLevel)
 
 	log.SetOutput(colorable.NewColorableStdout())
 	log.SetFormatter(&log.TextFormatter{
-		//	ForceColors:     true,
-		//	FullTimestamp:   true,
 		TimestampFormat: time.RFC822,
 	})
 	// fmt.Println("Adding hook")
 	log.AddHook(lfshook.NewHook(
-		pathMap,
+		infoPathMap,
+		&log.JSONFormatter{TimestampFormat: time.RFC822},
+	))
+
+	log.AddHook(lfshook.NewHook(
+		debugPathMap,
 		&log.JSONFormatter{TimestampFormat: time.RFC822},
 	))
 
