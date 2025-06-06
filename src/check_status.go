@@ -38,7 +38,7 @@ func status(config FinalConfig) bool {
 		}
 	}
 
-	log.Info("[SUCCESS] All checks went well.")
+	log.Debug("[SUCCESS] All checks went well.")
 	return true
 
 }
