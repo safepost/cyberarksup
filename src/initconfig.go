@@ -45,13 +45,13 @@ func initLogger() {
 	}
 
 	infoPathMap := lfshook.PathMap{
-		log.InfoLevel: filepath.Join(findPath(), logsDir, DefaultInfoLog),
+		log.InfoLevel: filepath.Join(logsDir, DefaultInfoLog),
 	}
 
 	// PathMap supplémentaire pour écrire info ET debug dans debug.log
 	debugPathMap := lfshook.PathMap{
-		log.InfoLevel:  filepath.Join(findPath(), logsDir, DefaultDebugLog),
-		log.DebugLevel: filepath.Join(findPath(), logsDir, DefaultDebugLog),
+		log.InfoLevel:  filepath.Join(logsDir, DefaultDebugLog),
+		log.DebugLevel: filepath.Join(logsDir, DefaultDebugLog),
 	}
 
 	log.SetLevel(logLevel)
