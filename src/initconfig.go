@@ -46,6 +46,8 @@ func initLogger() {
 
 	log.SetOutput(colorable.NewColorableStdout())
 	log.SetFormatter(&log.TextFormatter{
+		ForceColors:     true,
+		FullTimestamp:   true,
 		TimestampFormat: time.RFC822,
 	})
 	// fmt.Println("Adding hook")

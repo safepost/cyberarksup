@@ -34,7 +34,6 @@ func findVaultIPAddress(iniFilePath string) ([]string, error) {
 
 	vaultIPAddresses := cfg.Section("").Key("ADDRESS").String()
 	return strings.Split(vaultIPAddresses, ","), nil
-
 }
 
 func checkVault(vaultIPs []string, timeout time.Duration) bool {
